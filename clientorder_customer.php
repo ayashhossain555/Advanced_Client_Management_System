@@ -1,0 +1,259 @@
+<?php
+   session_start();
+   include_once "./dbconnection.php";
+   include_once "./sidebar_customer.php";
+
+   if(isset($_SESSION["user_id"])){
+    $sql="SELECT * FROM clients WHERE ID={$_SESSION["user_id"]}";
+    $result= $mysqli->query($sql);
+    $user=$result->fetch_assoc();
+   }
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>
+    Customer Dashboard
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!--ALERTIFY-->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+  <!-- CSS Files -->
+  <link id="pagestyle" href="assets/css/material-dashboard.css" rel="stylesheet" />
+  <style>
+    .form-control{
+        border: 1px solid #b3a1a1 !important;
+        padding: 8px 10px;
+    }
+  </style>
+</head>
+
+
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" navbar-scroll="true">
+      <div class="container-fluid py-1 px-3">
+       
+          <h6 class="font-weight-bolder mb-0">Your orders</h6>
+
+          <form action="searchorder_customer.php" method="GET">  
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group mb-3">
+            
+            
+                  <input type="text" name="search" class="form-control" value="<?php if(isset($_GET['search'])){echo $_GET['search'];}?>" placeholder="Search client order">
+                  <button type="submit" class="btn btn-danger">Search</button>
+            <!--      
+              <label class="form-label">Search here...</label>
+              <input type="text" name="search" class="form-control">
+
+              <input type="submit" name="submit" class="form-control">
+              <button type="submit" class='btn btn-primary'> Search </button>
+-->
+            </div>
+          </div>
+          
+        </div>
+        </form>
+      </div>
+    </nav>
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="">
+            <div class="card-header">
+                <h4>Order List<h4>
+            </div>
+            <div class="card-body">
+              <table class="table table-bordered table-striped" id="item">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Clients ID</th>
+                        <th>Name</th>
+                        <th>Client Email</th>
+                        <th>Clients contact No.</th>
+                        <th>Requested Service ID</th>
+                        <th>Requested Service Name</th>
+                        <th>Requested meeting date</th>
+                        <th>Meeting agenda</th>
+                        <th>Order Date</th>
+                        <th>Office member ID</th>
+                        <th>Office member name</th>
+                        <th>office member email</th>
+                        <th>Office member Contact no.</th>
+                        <th>Selected date for meeting</th>
+                        <th>Approval Status</th>
+                        <th>Service progress</th>
+                        <th>Payment Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+                    <tbody>
+                        <?php
+                          
+                   
+
+                        $idd=$user['ID'];
+                        $query="SELECT * FROM orders WHERE ID='$idd'";
+                        $run=mysqli_query($mysqli, $query);
+                    
+                        if(mysqli_num_rows($run)>0){
+                            foreach($run as $i){
+                                ?>
+                                <tr>
+                                  
+
+                                    <?php
+                                    if ($i['status']=='0'):{
+                                    ?>
+                                    <td> <?= $i['OID']; ?></td>
+                                    <td> <?= $i['ID']; ?></td>
+                                    <td> <?= $i['cname']; ?></td>
+                                    <td> <?= $i['cmail']; ?></td>
+                                    <td> <?= $i['cmobile']; ?></td>
+                                    <td> <?= $i['serviceid']; ?></td>
+                                    <td> <?= $i['sname']; ?></td>
+                                    <td> <?= $i['reqdate']; ?></td>
+                                    <td> <?= $i['agenda']; ?></td>
+                                    <td> <?= $i['issue']; ?></td>
+                                    <td> <?= $i['offmemberid']; ?></td>
+                                    <td> <?= $i['oname']; ?></td>
+                                    <td> <?= $i['omail']; ?></td>
+                                    <td> <?= $i['ophone']; ?></td>
+                                    <td> <?= $i['date']; ?></td>
+                                    <td> <?= $i['status']=='0'? "Pending":"Approved" ?></td>
+                                    <td> <?= $i['work']=='0'? "Ongoing":"Done" ?></td>
+                                    <td> <?= $i['pay']=='0'? "Unpaid":"Paid" ?></td>
+                                    <td><a href="editreqorder.php?OID=<?= $i["OID"]; ?>" class="btn btn-primary">Edit</a> 
+                                    </td>
+                                    <td>
+                                    <form action="deleteorder_customer.php" method="POST">
+                                        <input type="hidden" name="order_id" value="<?= $i['OID']; ?>">
+                                        <button type="submit" class="btn btn-danger" name="delete_btn">Delete</button>
+                                     </form>
+                                    </td>
+                                </tr>
+                                 <?php
+                                    }
+                                  elseif($i['status']=='1'):{
+                                      ?>
+                                      <td> <?= $i['OID']; ?></td>
+                                      <td> <?= $i['ID']; ?></td>
+                                      <td> <?= $i['cname']; ?></td>
+                                      <td> <?= $i['cmail']; ?></td>
+                                      <td> <?= $i['cmobile']; ?></td>
+                                      <td> <?= $i['serviceid']; ?></td>
+                                      <td> <?= $i['sname']; ?></td>
+                                      <td> <?= $i['reqdate']; ?></td>
+                                      <td> <?= $i['agenda']; ?></td>
+                                      <td> <?= $i['issue']; ?></td>
+                                      <td> <?= $i['offmemberid']; ?></td>
+                                      <td> <?= $i['oname']; ?></td>
+                                      <td> <?= $i['omail']; ?></td>
+                                      <td> <?= $i['ophone']; ?></td>
+                                      <td> <?= $i['date']; ?></td>
+                                      <td> <?= $i['status']=='0'? "Pending":"Approved" ?></td>
+                                      <td> <?= $i['work']=='0'? "Ongoing":"Done" ?></td>
+                                      <td> <?= $i['pay']=='0'? "Unpaid":"Paid" ?></td>
+                                      
+                                     
+                                  </tr>
+                                   <?php
+                                      }
+                                  endif;?>
+
+                                <?php
+                            }
+                        }
+                        ?>
+                         <?php
+                        if(isset($_POST['submit'])){
+                            $filtervalues =$_POST["search"];
+                            $queryy="SELECT * FROM clients WHERE name LIKE '%$filtervalues%' OR email LIKE '%$filtervalues%' OR password LIKE '%$filtervalues%' OR mobile LIKE '%$filtervalues%' OR pername LIKE '%$filtervalues%' OR organization LIKE '%$filtervalues%' OR  facebook LIKE '%$filtervalues%' OR twitter LIKE '%$filtervalues%' OR linkdin LIKE '%$filtervalues%' OR othersocial LIKE '%$filtervalues%'";
+                            $rrun=mysqli_query($mysqli, $queryy);
+                            
+
+                            
+                            if(mysqli_num_rows($rrun)>0)
+                            {
+                            foreach($rrun as $i)
+                            {  
+                            
+                                
+                                    ?>
+                                        <tr>
+                                            <td> <?= $i['ID']; ?></td>
+                                            <td> <?= $i['name']; ?></td>
+                                            <td> <?= $i['email']; ?></td>
+                                            <td> <?= $i['password']; ?></td>
+                                            <td> <?= $i['mobile']; ?></td>
+                                            <td> <?= $i['permail']; ?></td>
+                                            <td> <?= $i['organization']; ?></td>
+                                            <td> <?= $i['facebook']; ?></td>
+                                            <td> <?= $i['twitter']; ?></td>
+                                            <td> <?= $i['linkdin']; ?></td>
+                                            <td> <?= $i['othersocial']; ?></td>
+                                        </tr>
+                                    <?php
+                                }
+                            }
+                        }     
+                            
+               ?> 
+                    </tbody>
+                </thead>
+              </table>
+            </div>
+        </div>
+      </div>
+    
+
+    </div>
+</div>
+
+
+ <!--   Core JS Files   -->
+ <script src="assets/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/perfect-scrollbar.min.js"></script>
+  <script src="assets/js/smooth-scrollbar.min.js"></script>
+  <script src="assets/js/search.js"></script>
+  <!--ALERTIFY-->
+  <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+  <script>
+    <?php
+         if (isset($_SESSION["message"])){
+     alertify.set('notifier','position', 'top-center');
+    alertify.success();
+         }
+         ?>
+  </script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+</body>
+
+</html>
